@@ -1,25 +1,34 @@
-// app/api/tekneler/route.ts
 import { NextResponse } from 'next/server';
-import { TEKNELER } from '../../backend/tekneler';
+import clientPromise from '../../lib/mongodb';
 
-// Bu fonksiyon yeni tekne eklemeyi simüle eder
+// 1. GET: Veritabanındaki tüm tekneleri getirir
+export async function GET() {
+  try {
+    const client = await clientPromise;
+    const db = client.db("salify");
+    const tekneler = await db.collection("tekneler").find({}).toArray();
+    return NextResponse.json(tekneler);
+  } catch (error) {
+    return NextResponse.json({ error: "Veriler çekilemedi" }, { status: 500 });
+  }
+}
+
+// 2. POST: Yeni bir tekneyi veritabanına kaydeder
 export async function POST(request: Request) {
   try {
     const yeniTekne = await request.json();
-    
-    // Normalde burada veritabanına kayıt yapılır
-    // Şimdilik sadece gelen veriyi ID ekleyerek geri döneceğiz
-    const kayıtEdilecekTekne = {
+    const client = await clientPromise;
+    const db = client.db("salify");
+
+    const kayitEdilecekTekne = {
       ...yeniTekne,
-      id: (TEKNELER.length + 1).toString(), // Otomatik ID
-      resim: yeniTekne.resim || '/tekneler/tekneler-1.jpg', // Varsayılan resim
-      ozellikler: ['Yeni Kayıt', 'VIP Hizmet'], // Varsayılan özellikler
+      createdAt: new Date(), // Ne zaman eklendiğini bilelim
+      resim: yeniTekne.resim || '/tekneler/tekneler-1.jpg',
     };
 
-    // Konsola yazdıralım ki geldiğini görelim
-    console.log("Yeni Tekne Kaydı Geldi:", kayıtEdilecekTekne);
+    const result = await db.collection("tekneler").insertOne(kayitEdilecekTekne);
 
-    return NextResponse.json(kayıtEdilecekTekne, { status: 201 });
+    return NextResponse.json({ ...kayitEdilecekTekne, _id: result.insertedId }, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: "Kayıt sırasında hata oluştu" }, { status: 500 });
   }
