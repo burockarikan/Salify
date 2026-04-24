@@ -25,7 +25,7 @@ export default function Home() {
             </div>
 
             <h1 className="text-7xl md:text-[9rem] font-black mb-8 tracking-tighter leading-none text-white drop-shadow-[0_10px_20px_rgba(0,0,0,0.6)]">
-              SALIFY <span className="text-[#cdaa51] italic ml-4">PRO</span>
+              SALIFY <span className="text-[#cdaa51] italic ml-4">PROm</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-white/95 mb-14 max-w-3xl mx-auto font-medium leading-relaxed drop-shadow-md">
